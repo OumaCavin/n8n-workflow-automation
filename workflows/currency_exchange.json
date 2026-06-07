@@ -1,0 +1,131 @@
+{
+  "name": "Currency Exchange Converter",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "js": true
+        }
+      },
+      "id": "form-trigger",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "formTitle": "Currency Exchange",
+      "formDescription": "Convert currencies using live exchange rates",
+      "options": {
+        "fields": {
+          "values": [
+            {
+              "fieldLabel": "Base Currency",
+              "fieldType": "select",
+              "required": true,
+              "selectOptions": [
+                {"label": "USD - US Dollar", "value": "USD"},
+                {"label": "EUR - Euro", "value": "EUR"},
+                {"label": "GBP - British Pound", "value": "GBP"},
+                {"label": "JPY - Japanese Yen", "value": "JPY"},
+                {"label": "CAD - Canadian Dollar", "value": "CAD"},
+                {"label": "AUD - Australian Dollar", "value": "AUD"}
+              ]
+            },
+            {
+              "fieldLabel": "Target Currency",
+              "fieldType": "select",
+              "required": true,
+              "selectOptions": [
+                {"label": "USD - US Dollar", "value": "USD"},
+                {"label": "EUR - Euro", "value": "EUR"},
+                {"label": "GBP - British Pound", "value": "GBP"},
+                {"label": "JPY - Japanese Yen", "value": "JPY"},
+                {"label": "CAD - Canadian Dollar", "value": "CAD"},
+                {"label": "AUD - Australian Dollar", "value": "AUD"}
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.exchangerate-api.com/v4/latest/{{ $json.baseCurrency }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-request",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300],
+      "inputs": ["main"],
+      "outputs": ["main"],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "baseCurrency",
+              "value": "={{ $json.baseCurrency }}",
+              "type": "string"
+            },
+            {
+              "name": "targetCurrency",
+              "value": "={{ $json.targetCurrency }}",
+              "type": "string"
+            },
+            {
+              "name": "exchangeRate",
+              "value": "={{ $json('targetCurrency') ? $json('rates')[$json('targetCurrency')] : 'N/A' }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [650, 300],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    }
+  ],
+  "connections": {
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "currency-exchange-workflow",
+  "versionId": "1.0.0"
+}

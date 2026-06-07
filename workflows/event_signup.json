@@ -1,0 +1,103 @@
+{
+  "name": "Event Signup Form",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "js": true
+        }
+      },
+      "id": "form-trigger",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "formTitle": "Event Signup",
+      "formDescription": "Register for upcoming events",
+      "options": {
+        "fields": {
+          "values": [
+            {
+              "fieldLabel": "Event Name",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter event name"
+            },
+            {
+              "fieldLabel": "First Name",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter your first name"
+            },
+            {
+              "fieldLabel": "Last Name",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter your last name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter your email address"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "event_name",
+              "value": "={{ $json['Event Name'] }}",
+              "type": "string"
+            },
+            {
+              "name": "full_name",
+              "value": "={{ $json['First Name'] + ' ' + $json['Last Name'] }}",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "name": "registered_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [450, 300],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    }
+  ],
+  "connections": {
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "event-signup-workflow",
+  "versionId": "1.0.0"
+}

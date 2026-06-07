@@ -1,0 +1,105 @@
+{
+  "name": "Filtered Contact Record",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "js": true
+        }
+      },
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 200],
+      "outputs": ["main"]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "company_name",
+              "value": "Acme Corp",
+              "type": "string"
+            },
+            {
+              "name": "contact_name",
+              "value": "Jordan Lee",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "jordan.lee@acme.example",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields-initial",
+      "name": "Edit Fields - Initial",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [450, 200],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "contact_name",
+              "value": "={{ $json.contact_name }}",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields-filtered",
+      "name": "Edit Fields - Filtered",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [650, 200],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - Initial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields - Initial": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - Filtered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "contact-filtered-workflow",
+  "versionId": "1.0.0"
+}

@@ -1,0 +1,97 @@
+{
+  "name": "Event Signup with Timestamp",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "js": true
+        }
+      },
+      "id": "form-trigger",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "formTitle": "Event Signup",
+      "formDescription": "Register for events with automatic timestamp",
+      "options": {
+        "fields": {
+          "values": [
+            {
+              "fieldLabel": "Event name",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter event name"
+            },
+            {
+              "fieldLabel": "Attendee name",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter your full name"
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "text",
+              "required": true,
+              "placeholder": "Enter your email address"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "event_name",
+              "value": "={{ $json['Event name'] }}",
+              "type": "string"
+            },
+            {
+              "name": "attendee_name",
+              "value": "={{ $json['Attendee name'] }}",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "name": "submitted_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [450, 300],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    }
+  ],
+  "connections": {
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "event-signup-timestamp-workflow",
+  "versionId": "1.0.0"
+}

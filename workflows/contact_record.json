@@ -1,0 +1,67 @@
+{
+  "name": "Partner Contact Record",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "js": true
+        }
+      },
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "outputs": ["main"]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "fields": {
+          "values": [
+            {
+              "name": "company_name",
+              "value": "Acme Corp",
+              "type": "string"
+            },
+            {
+              "name": "contact_name",
+              "value": "Jordan Lee",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "value": "jordan.lee@acme.example",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "edit-fields",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1,
+      "position": [450, 300],
+      "inputs": ["main"],
+      "outputs": ["main"]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "contact-record-workflow",
+  "versionId": "1.0.0"
+}
