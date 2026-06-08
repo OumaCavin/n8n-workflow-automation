@@ -43,63 +43,58 @@ pip install -r requirements.txt
 
 ## Workflow Examples
 
-### 1. Currency Exchange Workflow
+### 1. Currency Exchange Workflow (Complete)
 
 **File:** `workflows/currency_exchange.json`
 
-This workflow demonstrates:
-- Form Trigger node for user input
-- HTTP Request node for API calls
+This complete workflow demonstrates:
+- Form Trigger node for user input with dropdown selections
+- HTTP Request node for API calls to open.er-api.com
 - Edit Fields node for data transformation
 - Real-time exchange rate conversion
 
 **To use:**
-1. Import the workflow
+1. Import the workflow into n8n
 2. Execute to open the form
-3. Select base and target currencies
+3. Select base and target currencies from dropdowns
 4. Submit to see real-time exchange rates
 
-### 2. Currency Rates Workflow
+### 2. Currency Rates Workflow (Starter)
 
-**File:** `workflows/currency_rates.json`
+**File:** `workflows/currency_rates_start.json`
 
-A workflow that fetches live currency exchange rates from a public API.
+A starter workflow that fetches live currency exchange rates. **You need to add a Manual Trigger node.**
 
 **To use:**
 1. Import the workflow
 2. Add a Manual Trigger node
 3. Connect the trigger to the HTTP Request node
-4. Execute to see live exchange rates
+4. Execute to see live exchange rates (USD to EUR, GBP, JPY)
 
-### 3. Event Signup Workflow
+### 3. Event Signup Workflow (Starter)
 
-**File:** `workflows/event_signup.json`
+**File:** `workflows/event_signup_start.json`
 
-Captures event signups with form fields:
-- Event name
-- Attendee name
-- Email
+A starter workflow that combines form fields into a signup record. **You need to add a Form Trigger node.**
 
 **To use:**
 1. Import the workflow
-2. Execute to open the form
-3. Fill in the details
-4. Submit to create a signup record
+2. Add a Form Trigger with fields: First Name, Last Name, Email
+3. Connect the Form Trigger to the Edit Fields node
+4. Execute and fill the form to create signup records
 
-### 4. Contact Record Workflow
+### 4. Contact Record Workflow (Solution)
 
-**File:** `workflows/contact_record.json`
+**File:** `workflows/contact_record_solution.json`
 
-Creates structured contact records with:
-- Company name
-- Contact name
-- Email address
+A complete workflow that creates structured contact records:
+- Manual Trigger at position [0,0]
+- Edit Fields at position [240,0]
+- Fields: company_name ("Acme Corp"), contact_name ("Jordan Lee"), email
 
 **To use:**
-1. Create a new workflow
-2. Add Manual Trigger
-3. Add Edit Fields (Set) node
-4. Configure fields as shown in the example
+1. Import the workflow
+2. Execute to see the contact record output
 
 ### 5. Filtered Contact Workflow
 
@@ -119,7 +114,7 @@ Advanced event signup that captures:
 - Event name
 - Attendee name
 - Email
-- Submission timestamp
+- Submission timestamp using {{ $now }} expression
 
 ## Key Concepts
 
@@ -169,7 +164,7 @@ n8n uses expressions for dynamic values:
 ## Public APIs Used
 
 The examples use these free public APIs:
-- Exchange rates API: `https://api.exchangerate-api.com/v4/latest/`
+- Exchange rates API: `https://open.er-api.com/v6/latest/`
 - Any HTTP endpoint returning JSON
 
 ## Project Structure

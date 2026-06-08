@@ -1,0 +1,57 @@
+{
+  "name": "Currency Rates",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://open.er-api.com/v6/latest/USD",
+        "options": {}
+      },
+      "id": "ex-http-001",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-eur",
+              "name": "USD to EUR",
+              "value": "={{ $json.rates.EUR }}",
+              "type": "number"
+            },
+            {
+              "id": "field-gbp",
+              "name": "USD to GBP",
+              "value": "={{ $json.rates.GBP }}",
+              "type": "number"
+            },
+            {
+              "id": "field-jpy",
+              "name": "USD to JPY",
+              "value": "={{ $json.rates.JPY }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ex-set-002",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [[{ "node": "Edit Fields", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  }
+}

@@ -1,103 +1,122 @@
 {
-  "name": "Currency Exchange Converter",
+  "name": "Currency Exchange",
   "nodes": [
     {
       "parameters": {
-        "rule": {
-          "js": true
-        }
-      },
-      "id": "form-trigger",
-      "name": "Form Trigger",
-      "type": "n8n-nodes-base.formTrigger",
-      "typeVersion": 1.1,
-      "position": [250, 300],
-      "formTitle": "Currency Exchange",
-      "formDescription": "Convert currencies using live exchange rates",
-      "options": {
-        "fields": {
+        "formTitle": "Currency Exchange",
+        "formDescription": "Select the currencies you'd like to compare.",
+        "formFields": {
           "values": [
             {
               "fieldLabel": "Base Currency",
-              "fieldType": "select",
-              "required": true,
-              "selectOptions": [
-                {"label": "USD - US Dollar", "value": "USD"},
-                {"label": "EUR - Euro", "value": "EUR"},
-                {"label": "GBP - British Pound", "value": "GBP"},
-                {"label": "JPY - Japanese Yen", "value": "JPY"},
-                {"label": "CAD - Canadian Dollar", "value": "CAD"},
-                {"label": "AUD - Australian Dollar", "value": "AUD"}
-              ]
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "USD"
+                  },
+                  {
+                    "option": "EUR"
+                  },
+                  {
+                    "option": "GBP"
+                  },
+                  {
+                    "option": "JPY"
+                  }
+                ]
+              },
+              "requiredField": true
             },
             {
               "fieldLabel": "Target Currency",
-              "fieldType": "select",
-              "required": true,
-              "selectOptions": [
-                {"label": "USD - US Dollar", "value": "USD"},
-                {"label": "EUR - Euro", "value": "EUR"},
-                {"label": "GBP - British Pound", "value": "GBP"},
-                {"label": "JPY - Japanese Yen", "value": "JPY"},
-                {"label": "CAD - Canadian Dollar", "value": "CAD"},
-                {"label": "AUD - Australian Dollar", "value": "AUD"}
-              ]
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "USD"
+                  },
+                  {
+                    "option": "EUR"
+                  },
+                  {
+                    "option": "GBP"
+                  },
+                  {
+                    "option": "JPY"
+                  },
+                  {
+                    "option": "AUD"
+                  },
+                  {
+                    "option": "CAD"
+                  }
+                ]
+              },
+              "requiredField": true
             }
           ]
-        }
-      }
+        },
+        "options": {}
+      },
+      "id": "demo-form-001",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "demo-currency-form"
     },
     {
       "parameters": {
-        "url": "=https://api.exchangerate-api.com/v4/latest/{{ $json.baseCurrency }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "json"
-            }
-          }
-        }
+        "url": "=https://open.er-api.com/v6/latest/{{ $json['Base Currency'] }}",
+        "options": {}
       },
-      "id": "http-request",
+      "id": "demo-http-002",
       "name": "HTTP Request",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 3,
-      "position": [450, 300],
-      "inputs": ["main"],
-      "outputs": ["main"],
-      "onError": "continueErrorOutput"
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
     },
     {
       "parameters": {
-        "mode": "raw",
-        "fields": {
-          "values": [
+        "assignments": {
+          "assignments": [
             {
-              "name": "baseCurrency",
-              "value": "={{ $json.baseCurrency }}",
+              "id": "field-base",
+              "name": "Base Currency",
+              "value": "={{ $('Form Trigger').item.json['Base Currency'] }}",
               "type": "string"
             },
             {
-              "name": "targetCurrency",
-              "value": "={{ $json.targetCurrency }}",
+              "id": "field-target",
+              "name": "Target Currency",
+              "value": "={{ $('Form Trigger').item.json['Target Currency'] }}",
               "type": "string"
             },
             {
-              "name": "exchangeRate",
-              "value": "={{ $json('targetCurrency') ? $json('rates')[$json('targetCurrency')] : 'N/A' }}",
+              "id": "field-rate",
+              "name": "Exchange Rate",
+              "value": "={{ $json.rates[$('Form Trigger').item.json['Target Currency']] }}",
               "type": "number"
             }
           ]
         },
         "options": {}
       },
-      "id": "edit-fields",
+      "id": "demo-set-003",
       "name": "Edit Fields",
       "type": "n8n-nodes-base.set",
-      "typeVersion": 1.1,
-      "position": [650, 300],
-      "inputs": ["main"],
-      "outputs": ["main"]
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        0
+      ]
     }
   ],
   "connections": {
@@ -124,8 +143,9 @@
       ]
     }
   },
-  "active": false,
-  "settings": {},
-  "id": "currency-exchange-workflow",
-  "versionId": "1.0.0"
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "id": "7JhTdS9QJYVXex8A"
 }

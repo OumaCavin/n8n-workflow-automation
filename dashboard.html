@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n Workflow Automation - Exercise Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #ea4b71;
+            --secondary-color: #484848;
+            --accent-color: #ea4b71;
+            --background-light: #f7f9fc;
+            --background-white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #ff6b8a 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .module-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--background-white);
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: var(--background-light);
+            color: var(--text-dark);
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .module-content {
+            display: none;
+        }
+
+        .module-content.active {
+            display: block;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .workflow-card {
+            background: var(--background-white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .workflow-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #ff6b8a 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .workflow-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-card-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            background: var(--background-light);
+            color: var(--secondary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .tag.trigger {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .tag.processing {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .tag.api {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .tag.form {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .workflow-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d63d5c;
+        }
+
+        .btn-secondary {
+            background: var(--background-light);
+            color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--background-white);
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--background-light);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-description {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-list {
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .step-item {
+            counter-increment: step;
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-item::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .step-content {
+            background: var(--background-light);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .node-flow {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: var(--background-light);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .node {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .node.arrow {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 0.25rem;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            color: #9cdcfe;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .json-preview {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--background-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+        }
+
+        .search-bar {
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--background-white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 2rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <h1>n8n Workflow Automation</h1>
+            <p>Master workflow automation with hands-on exercises covering triggers, APIs, data processing, and more</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Total Workflows</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Core Modules</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Trigger Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12+</div>
+                <div class="stat-label">Learning Objectives</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search workflows by name, tag, or keyword..." id="searchInput" onkeyup="filterWorkflows()">
+        </div>
+
+        <div class="module-tabs">
+            <button class="tab-button active" onclick="openModule('getting-started')">Getting Started</button>
+            <button class="tab-button" onclick="openModule('triggers')">Triggers & Forms</button>
+            <button class="tab-button" onclick="openModule('data-processing')">Data Processing</button>
+            <button class="tab-button" onclick="openModule('advanced')">Advanced Workflows</button>
+        </div>
+
+        <div id="getting-started" class="module-content active">
+            <div class="module-grid">
+                <div class="workflow-card" onclick="openWorkflowModal('currency-exchange')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">$</div>
+                    </div>
+                    <h3 class="workflow-card-title">Currency Exchange Converter</h3>
+                    <p class="workflow-card-description">Learn how to build a complete workflow that converts currencies using live exchange rates with form input.</p>
+                    <div class="workflow-tags">
+                        <span class="tag form">Form Trigger</span>
+                        <span class="tag api">HTTP Request</span>
+                        <span class="tag processing">Data Transform</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('currency_exchange')">Download JSON</button>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openWorkflowModal('currency-rates')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">R</div>
+                    </div>
+                    <h3 class="workflow-card-title">Currency Rates Fetcher</h3>
+                    <p class="workflow-card-description">Add a manual trigger to a workflow and fetch live currency exchange rates from a public API.</p>
+                    <div class="workflow-tags">
+                        <span class="tag trigger">Manual Trigger</span>
+                        <span class="tag api">HTTP Request</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('currency_rates')">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="triggers" class="module-content">
+            <div class="module-grid">
+                <div class="workflow-card" onclick="openWorkflowModal('event-signup')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">E</div>
+                    </div>
+                    <h3 class="workflow-card-title">Event Signup Form</h3>
+                    <p class="workflow-card-description">Create a self-service registration form for events with first name, last name, and email fields.</p>
+                    <div class="workflow-tags">
+                        <span class="tag form">Form Trigger</span>
+                        <span class="tag processing">Data Transform</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('event_signup')">Download JSON</button>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openWorkflowModal('event-signup-timestamp')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">T</div>
+                    </div>
+                    <h3 class="workflow-card-title">Event Signup with Timestamp</h3>
+                    <p class="workflow-card-description">Capture registration timestamps to track sign-up velocity and close registration at the right time.</p>
+                    <div class="workflow-tags">
+                        <span class="tag form">Form Trigger</span>
+                        <span class="tag processing">Expressions</span>
+                        <span class="tag processing">Timestamp</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('event_signup_timestamp')">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="data-processing" class="module-content">
+            <div class="module-grid">
+                <div class="workflow-card" onclick="openWorkflowModal('contact-record')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">C</div>
+                    </div>
+                    <h3 class="workflow-card-title">Partner Contact Record</h3>
+                    <p class="workflow-card-description">Build a workflow that creates structured contact records with company, contact, and email fields.</p>
+                    <div class="workflow-tags">
+                        <span class="tag trigger">Manual Trigger</span>
+                        <span class="tag processing">Field Mapping</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('contact_record')">Download JSON</button>
+                    </div>
+                </div>
+
+                <div class="workflow-card" onclick="openWorkflowModal('contact-filtered')">
+                    <div class="workflow-card-header">
+                        <div class="workflow-icon">F</div>
+                    </div>
+                    <h3 class="workflow-card-title">Filtered Contact Workflow</h3>
+                    <p class="workflow-card-description">Filter out unnecessary fields by keeping only contact name and email for mailing list systems.</p>
+                    <div class="workflow-tags">
+                        <span class="tag processing">Field Filtering</span>
+                        <span class="tag processing">Data Transform</span>
+                    </div>
+                    <div class="workflow-card-actions">
+                        <button class="btn btn-primary">Start Exercise</button>
+                        <button class="btn btn-secondary" onclick="event.stopPropagation(); downloadWorkflow('contact_filtered')">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="advanced" class="module-content">
+            <div class="empty-state">
+                <div class="empty-state-icon">🚀</div>
+                <h3>Coming Soon</h3>
+                <p>Advanced workflow patterns including error handling, conditional logic, loops, and API authentication.</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Built by Cavin Otieno | n8n Workflow Automation Guide | <a href="https://github.com/OumaCavin/n8n-workflow-automation">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <div class="modal" id="workflowModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Workflow Title</h2>
+                <p class="modal-description" id="modalDescription">Workflow description goes here</p>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Learning Objectives</h3>
+                <ul class="step-list" id="objectivesList"></ul>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Step-by-Step Instructions</h3>
+                <ul class="step-list" id="stepsList"></ul>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Workflow Structure</h3>
+                <div class="node-flow" id="nodeFlow"></div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Key Concepts</h3>
+                <div class="step-content" id="keyConcepts"></div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Workflow JSON</h3>
+                <div class="json-preview">
+                    <pre class="code-block" id="jsonPreview"></pre>
+                </div>
+                <div class="workflow-card-actions" style="margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="copyJson()">Copy JSON</button>
+                    <button class="btn btn-secondary" onclick="downloadCurrentWorkflow()">Download JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const workflowData = {
+            'currency-exchange': {
+                title: 'Currency Exchange Converter',
+                description: 'Learn to build a complete workflow that converts currencies using live exchange rates with form input, HTTP requests, and data transformation.',
+                objectives: [
+                    'Understand how data flows from Form Trigger through HTTP Request to Edit Fields',
+                    'Learn to configure HTTP Request nodes with dynamic URLs',
+                    'Practice extracting and transforming data from API responses',
+                    'Master the use of expressions to access form data and API results'
+                ],
+                steps: [
+                    {
+                        title: 'Import the Workflow',
+                        content: 'Open n8n, click "Create Workflow", then select "Import from File" and choose currency_exchange.json from the Desktop/Resources folder.'
+                    },
+                    {
+                        title: 'Execute the Workflow',
+                        content: 'Click "Test Workflow" to open the form. Select a Base Currency (e.g., "USD") and a Target Currency (e.g., "EUR") from the dropdowns, then click Submit.'
+                    },
+                    {
+                        title: 'Inspect Form Trigger Output',
+                        content: 'Double-click the Form Trigger node. Under the Output tab, you will see the currencies you selected in the form (e.g., "baseCurrency" and "targetCurrency").'
+                    },
+                    {
+                        title: 'Examine HTTP Request Output',
+                        content: 'Open the HTTP Request node. The Output shows the raw exchange rate data returned by the public API, including rates for many currencies.'
+                    },
+                    {
+                        title: 'Review Edit Fields Output',
+                        content: 'Open the Edit Fields node. Toggle between Table and JSON views to see the clean, structured result showing Base Currency, Target Currency, and Exchange Rate.'
+                    }
+                ],
+                nodes: ['Form Trigger', 'HTTP Request', 'Edit Fields'],
+                concepts: 'This workflow demonstrates the fundamental data flow in n8n: triggers receive input, nodes process data sequentially, and each node can transform, filter, or enhance the data before passing it to the next node.',
+                file: 'currency_exchange.json'
+            },
+            'currency-rates': {
+                title: 'Currency Rates Fetcher',
+                description: 'Add a manual trigger to a workflow and execute it to fetch live currency exchange rates from a public API.',
+                objectives: [
+                    'Learn to add and configure Manual Trigger nodes',
+                    'Understand how to connect nodes to create a data flow',
+                    'Practice executing workflows and inspecting outputs',
+                    'Gain experience with HTTP Request nodes'
+                ],
+                steps: [
+                    {
+                        title: 'Import the Starter Workflow',
+                        content: 'Create a new workflow and import currency_rates_start.json. You will see an HTTP Request node connected to an Edit Fields node, but no trigger.'
+                    },
+                    {
+                        title: 'Add Manual Trigger',
+                        content: 'Click the + button (or press Tab) and search for "Manual Trigger". Click to add it to your canvas.'
+                    },
+                    {
+                        title: 'Connect the Nodes',
+                        content: 'Drag the Manual Trigger output handle to the HTTP Request node input to connect them.'
+                    },
+                    {
+                        title: 'Execute the Workflow',
+                        content: 'Click "Test Workflow" button. Watch the nodes light up as data flows from the trigger through the HTTP Request to Edit Fields.'
+                    },
+                    {
+                        title: 'Inspect Live Exchange Rates',
+                        content: 'Open the Edit Fields Output to see the formatted exchange rates including EUR, GBP, and JPY rates based on USD.'
+                    }
+                ],
+                nodes: ['Manual Trigger', 'HTTP Request', 'Edit Fields'],
+                concepts: 'Manual Triggers are perfect for testing workflows and for tasks you want to execute on-demand. The first domino in the chain must always be a trigger to start the workflow.',
+                file: 'currency_rates_start.json'
+            },
+            'event-signup': {
+                title: 'Event Signup Form',
+                description: 'Create a self-service registration form for events that captures attendee information and creates structured signup records. This starter workflow needs a Form Trigger to be added.',
+                objectives: [
+                    'Learn to create Form Triggers with multiple fields',
+                    'Configure form field types (text, select, etc.)',
+                    'Set field requirements and placeholders',
+                    'Understand how form data flows to subsequent nodes'
+                ],
+                steps: [
+                    {
+                        title: 'Import the Starter Workflow',
+                        content: 'Create a new workflow and import event_signup_start.json. You will see an Edit Fields node that combines form fields into a signup record, but has no trigger to feed it data.'
+                    },
+                    {
+                        title: 'Add Form Trigger',
+                        content: 'Click the + button and search for "Form Trigger". Set the title to "Event Signup" and add three fields: First Name (Text), Last Name (Text), and Email (Text). Enable Required for all fields.'
+                    },
+                    {
+                        title: 'Connect to Edit Fields',
+                        content: 'Drag the Form Trigger output to the Edit Fields node input to connect them.'
+                    },
+                    {
+                        title: 'Execute the Workflow',
+                        content: 'Click "Test Workflow" button to open the form. Fill in the fields with test data and submit.'
+                    },
+                    {
+                        title: 'Inspect Output',
+                        content: 'Open the Edit Fields node Output to see the formatted signup record with full_name, email, and registered_at timestamp.'
+                    }
+                ],
+                nodes: ['Form Trigger', 'Edit Fields'],
+                concepts: 'Form Triggers allow you to collect user input through customizable forms. Each form field becomes a property in the JSON data that flows to subsequent nodes.',
+                file: 'event_signup_start.json'
+            },
+            'event-signup-timestamp': {
+                title: 'Event Signup with Timestamp',
+                description: 'Capture registration timestamps to track sign-up velocity and know exactly when each attendee registered.',
+                objectives: [
+                    'Master the use of expressions in n8n',
+                    'Learn to use the {{ $now }} expression for timestamps',
+                    'Understand how to add computed fields to workflow data',
+                    'Practice passing through form fields while adding new ones'
+                ],
+                steps: [
+                    {
+                        title: 'Create Workflow Structure',
+                        content: 'Create a workflow with a Form Trigger containing three fields: Event name, Attendee name, and Email.'
+                    },
+                    {
+                        title: 'Add Edit Fields Node',
+                        content: 'Connect the Form Trigger to an Edit Fields (Set) node.'
+                    },
+                    {
+                        title: 'Pass Through Form Fields',
+                        content: 'Drag each form field from the Input panel into the value boxes, or use expressions like {{ $json["Event name"] }}.'
+                    },
+                    {
+                        title: 'Add Timestamp Field',
+                        content: 'Click "Add Field", name it "submitted_at", click the expression toggle (=), and enter {{ $now }} as the value.'
+                    },
+                    {
+                        title: 'Execute and Verify',
+                        content: 'Execute the workflow, fill in the form, submit, and confirm the Output shows form data plus the submitted_at timestamp.'
+                    }
+                ],
+                nodes: ['Form Trigger', 'Edit Fields'],
+                concepts: 'The {{ $now }} expression returns the current timestamp, useful for tracking when events occurred. Expressions can reference previous node data using {{ $json.fieldName }} syntax.',
+                file: 'event_signup_timestamp.json'
+            },
+            'contact-record': {
+                title: 'Partner Contact Record',
+                description: 'Build a workflow that creates structured contact records with company, contact name, and email fields using example data. Import the solution file to see the complete workflow.',
+                objectives: [
+                    'Learn to create workflows from scratch',
+                    'Practice setting static values in Edit Fields nodes',
+                    'Understand field types (String, Number, etc.)',
+                    'Create reusable contact record structures'
+                ],
+                steps: [
+                    {
+                        title: 'Import the Solution Workflow',
+                        content: 'Create a new workflow and import contact_record_solution.json. This workflow has a Manual Trigger connected to an Edit Fields node with example values.'
+                    },
+                    {
+                        title: 'Inspect the Workflow Structure',
+                        content: 'Examine the nodes: Manual Trigger at position [0,0] connected to Edit Fields at position [240,0].'
+                    },
+                    {
+                        title: 'Review Edit Fields Configuration',
+                        content: 'Open the Edit Fields node to see the three fields: company_name ("Acme Corp"), contact_name ("Jordan Lee"), and email ("jordan.lee@acme.example").'
+                    },
+                    {
+                        title: 'Execute the Workflow',
+                        content: 'Click "Test Workflow" to execute. Watch the data flow from the Manual Trigger through to the Edit Fields node.'
+                    },
+                    {
+                        title: 'Verify Output',
+                        content: 'Open the Edit Fields Output to see all three fields: company_name, contact_name, and email with the example values.'
+                    }
+                ],
+                nodes: ['Manual Trigger', 'Edit Fields'],
+                concepts: 'Edit Fields (Set) nodes can create new fields with static values or dynamic expressions. This is the foundation for data transformation in n8n workflows.',
+                file: 'contact_record_solution.json'
+            },
+            'contact-filtered': {
+                title: 'Filtered Contact Workflow',
+                description: 'Filter out unnecessary fields by keeping only contact name and email, demonstrating how to reduce data complexity for downstream systems.',
+                objectives: [
+                    'Learn to filter and remove unwanted fields',
+                    'Practice passing through specific fields from input',
+                    'Understand data flow between connected nodes',
+                    'Reduce data complexity for specific use cases'
+                ],
+                steps: [
+                    {
+                        title: 'Start or Import Workflow',
+                        content: 'Either continue with your contact record workflow from the previous exercise, or create a new workflow and import contact_record_solution.json.'
+                    },
+                    {
+                        title: 'Add Second Edit Fields Node',
+                        content: 'After the existing Edit Fields node, add a second Edit Fields (Set) node and connect them.'
+                    },
+                    {
+                        title: 'Configure Filtered Fields',
+                        content: 'In the new Edit Fields node, drag only contact_name and email from the Input panel into the value boxes. Do NOT include company_name.'
+                    },
+                    {
+                        title: 'Execute and Verify',
+                        content: 'Execute the workflow and confirm only the contact name and email are retained in the output, with company_name filtered out.'
+                    }
+                ],
+                nodes: ['Manual Trigger', 'Edit Fields - Initial', 'Edit Fields - Filtered'],
+                concepts: 'By only defining the fields you want in Edit Fields, you can filter out unnecessary data. This is useful when downstream systems only need specific information.',
+                file: 'contact_filtered.json'
+            }
+        };
+
+        let currentWorkflow = null;
+
+        function openModule(moduleId) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.module-content').forEach(content => content.classList.remove('active'));
+
+            document.querySelector(`[onclick="openModule('${moduleId}')"]`).classList.add('active');
+            document.getElementById(moduleId).classList.add('active');
+        }
+
+        function openWorkflowModal(workflowId) {
+            currentWorkflow = workflowData[workflowId];
+
+            document.getElementById('modalTitle').textContent = currentWorkflow.title;
+            document.getElementById('modalDescription').textContent = currentWorkflow.description;
+
+            const objectivesList = document.getElementById('objectivesList');
+            objectivesList.innerHTML = '';
+            currentWorkflow.objectives.forEach(obj => {
+                const li = document.createElement('li');
+                li.className = 'step-item';
+                li.innerHTML = `<div class="step-content">${obj}</div>`;
+                objectivesList.appendChild(li);
+            });
+
+            const stepsList = document.getElementById('stepsList');
+            stepsList.innerHTML = '';
+            currentWorkflow.steps.forEach(step => {
+                const li = document.createElement('li');
+                li.className = 'step-item';
+                li.innerHTML = `<strong>${step.title}</strong><div class="step-content">${step.content}</div>`;
+                stepsList.appendChild(li);
+            });
+
+            const nodeFlow = document.getElementById('nodeFlow');
+            nodeFlow.innerHTML = '';
+            currentWorkflow.nodes.forEach((node, index) => {
+                if (index > 0) {
+                    const arrow = document.createElement('span');
+                    arrow.className = 'node arrow';
+                    arrow.textContent = '→';
+                    nodeFlow.appendChild(arrow);
+                }
+                const nodeSpan = document.createElement('span');
+                nodeSpan.className = 'node';
+                nodeSpan.textContent = node;
+                nodeFlow.appendChild(nodeSpan);
+            });
+
+            document.getElementById('keyConcepts').textContent = currentWorkflow.concepts;
+
+            loadJsonPreview(currentWorkflow.file);
+
+            document.getElementById('workflowModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('workflowModal').classList.remove('active');
+            currentWorkflow = null;
+        }
+
+        function loadJsonPreview(filename) {
+            fetch(`workflows/${filename}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('jsonPreview').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    document.getElementById('jsonPreview').textContent = '// JSON file not found. Please download the workflow from n8n.';
+                });
+        }
+
+        function copyJson() {
+            const jsonContent = document.getElementById('jsonPreview').textContent;
+            navigator.clipboard.writeText(jsonContent).then(() => {
+                alert('JSON copied to clipboard!');
+            });
+        }
+
+        function downloadCurrentWorkflow() {
+            if (currentWorkflow) {
+                downloadWorkflow(currentWorkflow.file.replace('.json', ''));
+            }
+        }
+
+        function downloadWorkflow(workflowId) {
+            const filename = workflowId + '.json';
+            const link = document.createElement('a');
+            link.href = `workflows/${filename}`;
+            link.download = filename;
+            link.click();
+        }
+
+        function filterWorkflows() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.workflow-card');
+
+            cards.forEach(card => {
+                const title = card.querySelector('.workflow-card-title').textContent.toLowerCase();
+                const description = card.querySelector('.workflow-card-description').textContent.toLowerCase();
+                const tags = card.querySelectorAll('.tag');
+                let tagText = '';
+                tags.forEach(tag => tagText += tag.textContent.toLowerCase() + ' ');
+
+                if (title.includes(searchTerm) || description.includes(searchTerm) || tagText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.getElementById('workflowModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
